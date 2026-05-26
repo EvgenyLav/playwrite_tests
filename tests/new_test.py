@@ -1,0 +1,58 @@
+import re
+from playwright.sync_api import Playwright, sync_playwright, expect
+
+
+def run(playwright: Playwright) -> None:
+    browser = playwright.chromium.launch(headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto("https://test.intercars-tickets.com/")
+    page.get_by_role("button", name="Согласен", exact=True).click()
+    page.get_by_role("textbox", name="Пункт отправления").click()
+    page.get_by_role("textbox", name="Пункт отправления").fill("Минск")
+    page.get_by_role("textbox", name="Выберите пункт назначения").click()
+    page.get_by_role("textbox", name="Выберите пункт назначения").fill("Москва")
+    page.get_by_role("textbox", name="Выберите дату").click()
+    page.get_by_role("button", name="24 мая 2026 г. 27 €").click()
+    page.get_by_role("button", name="Найти билеты").click()
+    page.get_by_text("19:40").first.locator("..").get_by_role("button", name="Выбрать билет").click()
+    page.get_by_text("19:40").first.locator("..").get_by_role("button", name="Выбрать билет").click()
+    page.locator("input[name=\"Passengers.1.LastName\"]").click()
+    page.locator("input[name=\"Passengers.1.LastName\"]").fill("Тест")
+    page.locator("input[name=\"Passengers.1.FirstName\"]").click()
+    page.locator("input[name=\"Passengers.1.FirstName\"]").fill("Тест")
+    page.locator("input[name=\"Passengers.1.MiddleName\"]").click()
+    page.locator("input[name=\"Passengers.1.MiddleName\"]").fill("Тест")
+    page.get_by_role("textbox", name="ДД.ММ.ГГГГ").click()
+    page.get_by_role("textbox", name="ДД.ММ.ГГГГ").fill("10.10.1993")
+    page.locator(".PassengerCard_order-form-row__box__xOuGz > .PassengerCard_order-form-row__wrapper__Gq1hS > .css-b62m3t-container > .css-hzhnzo-control > .css-hlgwow > .css-19bb58m").click()
+    page.get_by_role("option", name="Беларусь").click()
+    page.locator("input[name=\"Passengers.1.DocumentNumber\"]").click()
+    page.locator("input[name=\"Passengers.1.DocumentNumber\"]").fill("124124124РВ3")
+    page.screenshot(path="debug_before_seat.png")
+    print("URL:", page.url)
+    page.get_by_text("68", exact=True).click(force=True, timeout=60000)
+    page.locator("input[name=\"Phone\"]").click()
+    page.locator("input[name=\"Phone\"]").fill("+1 (212) 323-1213")
+    page.get_by_test_id("email").click()
+    page.get_by_test_id("email").fill("some@mail.ru")
+    page.get_by_test_id("termsAcceptedPolity").check()
+    page.get_by_test_id("termsAcceptedProcessing").check()
+    page.get_by_role("button", name="Оформить билет").click()
+    page.get_by_role("button", name="Оплатить").click()
+    page.get_by_role("textbox", name="0000 0000 0000").click()
+    page.get_by_role("textbox", name="0000 0000 0000").fill("4111 1111 1111 1111")
+    page.get_by_role("textbox", name="/00").fill("12/34")
+    page.get_by_role("textbox", name="000", exact=True).click()
+    page.get_by_role("textbox", name="000", exact=True).fill("123")
+    page.locator("[data-test-id=\"submitPayByCardForm\"]").click()
+    page.get_by_role("textbox", name="Пароль").fill("12345678")
+    expect(page.get_by_role("heading", name="Платеж не прошел")).to_be_visible()
+
+    # ---------------------
+    context.close()
+    browser.close()
+
+
+with sync_playwright() as playwright:
+    run(playwright)

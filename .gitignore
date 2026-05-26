@@ -1,0 +1,22 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# IDE
+.idea/
+
+# Test artifacts
+allure-results/
+.pytest_cache/
+
+# Claude
+.claude/
+memory/
+
+# Debug screenshots
+debug_test2.png
+*.png
