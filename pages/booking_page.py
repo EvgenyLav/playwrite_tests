@@ -44,11 +44,26 @@ class BookingPage:
             has_text=re.compile(r"\S")
         ).count() > 0
 
-    def has_email_error(self) -> bool:
+    def _field_has_error(self, field_locator) -> bool:
         error = self.page.locator("[class*='error']").filter(has_text=re.compile(r"\S"))
         return self.page.locator("div").filter(
-            has=self.page.get_by_test_id("email")
+            has=field_locator
         ).filter(has=error).count() > 0
+
+    def has_last_name_error(self) -> bool:
+        return self._field_has_error(self.page.locator("input[name='Passengers.1.LastName']"))
+
+    def has_first_name_error(self) -> bool:
+        return self._field_has_error(self.page.locator("input[name='Passengers.1.FirstName']"))
+
+    def has_dob_error(self) -> bool:
+        return self._field_has_error(self.page.get_by_role("textbox", name="ДД.ММ.ГГГГ"))
+
+    def has_phone_error(self) -> bool:
+        return self._field_has_error(self.page.locator("input[name='Phone']"))
+
+    def has_email_error(self) -> bool:
+        return self._field_has_error(self.page.get_by_test_id("email"))
 
     @allure.step("Получить итоговую стоимость на странице бронирования")
     def get_total_price(self) -> str:
