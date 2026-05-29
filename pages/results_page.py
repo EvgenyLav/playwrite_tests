@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 
 import allure
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, TimeoutError as PlaywrightTimeoutError
 
 
 class ResultsPage:
@@ -28,11 +28,16 @@ class ResultsPage:
 
     @allure.step("Проверить наличие рейса {departure_time} перевозчика {carrier}")
     def trip_exists(self, departure_time: str, carrier: str) -> bool:
-        return self.page.locator("[class*='ListRatesItem_list-item__']").filter(
+        locator = self.page.locator("[class*='ListRatesItem_list-item__']").filter(
             has_text=departure_time
         ).filter(
             has_text=carrier
-        ).count() > 0
+        )
+        try:
+            locator.first.wait_for(timeout=15000)
+            return True
+        except PlaywrightTimeoutError:
+            return False
 
     @allure.step("Получить цену рейса {departure_time} перевозчика {carrier}")
     def get_price(self, departure_time: str, carrier: str) -> str:

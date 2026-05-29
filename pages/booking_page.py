@@ -74,6 +74,12 @@ class BookingPage:
         match = re.search(r"\d[\d\s.,]*(?:EUR|BYN|USD|руб|₽)", text)
         return match.group().strip() if match else text.strip()
 
+    @allure.step("Выбрать метод оплаты")
+    def select_payment_method(self, value: str):
+        locator = self.page.locator(f'input[value="{value}"]')
+        if locator.count() > 0:
+            locator.dispatch_event("click")
+
     @allure.step("Принять условия соглашения")
     def accept_terms(self):
         self.page.get_by_test_id("termsAcceptedPolity").check(force=True)

@@ -3,10 +3,8 @@ import re
 import allure
 import pytest
 
-from config import TEST_CARD
 from pages.booking_page import BookingPage
 from pages.main_page import MainPage
-from pages.payment_page import PaymentPage
 from pages.success_page import SuccessPage
 from pages.pre_payment_page import PrePaymentPage
 from pages.results_page import ResultsPage
@@ -17,7 +15,7 @@ from utils import pdf as pdf_utils
 @allure.feature("Оформление заказа")
 @allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.smoke
-def test_booking(page, passenger, trip):
+def test_booking(page, passenger, trip, payment_scenario):
     allure.dynamic.title(f"Смоук: бронирование {trip}")
     allure.dynamic.story(f"{trip.from_city} → {trip.to_city}")
 
@@ -58,6 +56,7 @@ def test_booking(page, passenger, trip):
     assert booking_price == price, \
         f"Цена изменилась на шаге бронирования: '{booking_price}' ≠ '{price}'"
 
+    booking.select_payment_method(payment_scenario.selector)
     booking.accept_terms()
     booking.submit()
 
@@ -83,9 +82,8 @@ def test_booking(page, passenger, trip):
     pre_payment.pay()
 
     # Шаг 5: Оплата
-    payment = PaymentPage(page)
-    payment.fill_card(TEST_CARD.number, TEST_CARD.expiry, TEST_CARD.cvv)
-    payment.submit_3ds(TEST_CARD.password_3ds)
+    payment = payment_scenario.page_class(page)
+    payment.complete(payment_scenario.card)
 
     # Шаг 6: Успешная оплата — скачать билет и проверить содержимое
     success = SuccessPage(page)

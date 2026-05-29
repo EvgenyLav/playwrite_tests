@@ -1,7 +1,19 @@
+from dataclasses import dataclass
+
 import allure
 import pytest
 
+from config import TEST_CARD, WEBPAY_CARD
+from pages.payment_page import PaymentPage
+from pages.webpay_page import WebPayPage
 from utils.test_data import generate_passenger, TripData
+
+
+@dataclass
+class PaymentScenario:
+    selector: str
+    page_class: type
+    card: object
 
 collect_ignore = ["tests/new_test.py"]
 
@@ -42,6 +54,22 @@ def attach_screenshot_on_failure(page, request):
 @pytest.fixture
 def passenger():
     return generate_passenger()
+
+
+@pytest.fixture(
+    params=[
+        pytest.param(
+            PaymentScenario(selector="alfaBank", page_class=PaymentPage, card=TEST_CARD),
+            id="alfa-bank",
+        ),
+        pytest.param(
+            PaymentScenario(selector="webPay", page_class=WebPayPage, card=WEBPAY_CARD),
+            id="web-pay",
+        ),
+    ]
+)
+def payment_scenario(request):
+    return request.param
 
 
 @pytest.fixture(

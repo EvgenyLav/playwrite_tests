@@ -20,3 +20,8 @@ class PaymentPage:
     def submit_3ds(self, password: str):
         self.page.get_by_role("textbox", name="Пароль").press_sequentially(password, delay=300)
         self.page.wait_for_url(re.compile(r"intercars-tickets\.com"), timeout=30000)
+
+    @allure.step("Оплатить через Alfa Bank")
+    def complete(self, card):
+        self.fill_card(card.number, card.expiry, card.cvv)
+        self.submit_3ds(card.password_3ds)

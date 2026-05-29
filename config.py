@@ -22,3 +22,21 @@ TEST_CARD = CardData(
     cvv="123",
     password_3ds="12345678",
 )
+
+
+@dataclass(frozen=True)
+class WebPayCardData:
+    month: str
+    year: str
+    holder: str
+    cvv: str
+    email: str
+
+
+WEBPAY_CARD = WebPayCardData(
+    month="06",
+    year="27",
+    holder="TEST USER",
+    cvv="123",
+    email="test@test.com",
+)
