@@ -7,8 +7,10 @@ from config import TEST_CARD
 from pages.booking_page import BookingPage
 from pages.main_page import MainPage
 from pages.payment_page import PaymentPage
+from pages.success_page import SuccessPage
 from pages.pre_payment_page import PrePaymentPage
 from pages.results_page import ResultsPage
+from utils import pdf as pdf_utils
 
 
 @allure.epic("Бронирование билетов")
@@ -84,4 +86,20 @@ def test_booking(page, passenger, trip):
     payment = PaymentPage(page)
     payment.fill_card(TEST_CARD.number, TEST_CARD.expiry, TEST_CARD.cvv)
     payment.submit_3ds(TEST_CARD.password_3ds)
-    # Редирект после 3DS проходит, но билет не создаётся из-за бага API
+
+    # Шаг 6: Успешная оплата — скачать билет и проверить содержимое
+    success = SuccessPage(page)
+    success.wait_for_page()
+    download = success.download_ticket()
+
+    ticket_path = download.path()
+    assert pdf_utils.is_pdf(ticket_path), \
+        f"Скачанный файл '{download.suggested_filename}' не является PDF"
+
+    ticket_text = pdf_utils.extract_text(ticket_path).lower()
+    assert passenger.last_name.lower() in ticket_text, \
+        f"Фамилия '{passenger.last_name}' не найдена в билете"
+    assert passenger.first_name.lower() in ticket_text, \
+        f"Имя '{passenger.first_name}' не найдено в билете"
+    assert pdf_utils.digits_only(price) in pdf_utils.digits_only(ticket_text), \
+        f"Сумма '{price}' не найдена в билете"

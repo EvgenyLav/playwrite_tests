@@ -10,7 +10,7 @@ class PrePaymentPage:
 
     @allure.step("Дождаться страницы подтверждения данных")
     def wait_for_page(self):
-        expect(self.page.get_by_role("heading", name="Проверка данных")).to_be_visible(timeout=10000)
+        expect(self.page.get_by_role("heading", name="Проверка данных")).to_be_visible(timeout=30000)
 
     @allure.step("Проверить наличие ФИО пассажира на странице подтверждения")
     def has_passenger_name(self, name: str) -> bool:

@@ -47,7 +47,7 @@ def passenger():
 @pytest.fixture(
     params=[
         pytest.param(
-            TripData(from_city="Минск", to_city="Москва", departure_time="19:30", carrier="Intercars"),
+            TripData(from_city="Минск", to_city="Москва", departure_time="19:30", carrier="Intercars", days_offset=1),
             id="minsk-moscow-1930-intercars",
         ),
     ]

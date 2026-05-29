@@ -39,7 +39,13 @@ class MainPage:
     def select_date(self, days_offset: int) -> datetime:
         target = datetime.now() + timedelta(days=days_offset)
         self.page.get_by_role("textbox", name="Выберите дату").click()
-        self.page.get_by_role("button", name=re.compile(rf"{target.day} {MONTHS_RU[target.month]}")).click()
+        self.page.locator(".react-calendar").wait_for()
+        date_button = self.page.get_by_role("button", name=re.compile(rf"^{target.day} {MONTHS_RU[target.month]}"))
+        for _ in range(3):
+            if date_button.count() > 0:
+                break
+            self.page.locator(".react-calendar__navigation__next-button").click()
+        date_button.click()
         return target
 
     def is_calendar_date_disabled(self, date: datetime) -> bool:
